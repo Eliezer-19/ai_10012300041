@@ -1,8 +1,9 @@
 # Streamlit Community Cloud / Linux builders:
-# Default `torch` from PyPI pulls CUDA stacks (nvidia-*, triton). Triton often has no wheel for
-# the builder Python/ABI (e.g. Python 3.14), which fails install. Install CPU-only PyTorch first.
+# - Install CPU-only PyTorch from PyTorch's CPU index (avoids CUDA + triton on small builders).
+# - Pin must match wheels for the builder Python. On Python 3.14, older pins (e.g. 2.5.1+cpu)
+#   may not exist; use a version pip lists for your ABI (see deploy log), e.g. 2.11.0+cpu.
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.5.1+cpu
+torch==2.11.0+cpu
 
 pandas>=2.0,<3
 pypdf>=4.0
