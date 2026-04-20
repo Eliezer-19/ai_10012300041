@@ -14,7 +14,17 @@ from __future__ import annotations
 import json
 import logging
 import os
+import sys
 from pathlib import Path
+
+# Streamlit Cloud installs deps from requirements.txt only; without `pip install -e .`, packages
+# under `src/` are not on PYTHONPATH. Support both editable installs and plain clones.
+_APP_DIR = Path(__file__).resolve().parent
+_SRC_DIR = _APP_DIR / "src"
+if _SRC_DIR.is_dir():
+    _src = str(_SRC_DIR)
+    if _src not in sys.path:
+        sys.path.insert(0, _src)
 
 import streamlit as st
 
