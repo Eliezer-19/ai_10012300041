@@ -288,7 +288,7 @@ def main() -> None:
             "```toml\n"
             'OLLAMA_API_KEY = "your_key_here"\n'
             'OLLAMA_HOST = "https://ollama.com"\n'
-            'OLLAMA_MODEL = "gpt-oss"\n'
+            'OLLAMA_MODEL = "gpt-oss:120b-cloud"\n'
             "```\n\n"
             "**Option B — Self-hosted:** expose Ollama (ideally HTTPS + auth) and set `OLLAMA_HOST` to that base URL.\n\n"
             "Do not use `/api/chat` or `/api/generate` in the host field — base URL only."
