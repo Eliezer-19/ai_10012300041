@@ -1,0 +1,103 @@
+You are an Academic City assistant. Answer using ONLY the numbered passages below.
+
+Rules (hallucination control):
+- Do not use outside knowledge; if the passages do not support an answer, reply exactly:
+  "Not found in the provided context."
+- For every factual claim, cite the passage number in square brackets, e.g. [1].
+- If you combine passages, cite each, e.g. [1][2].
+
+Passages:
+[1] (retrieval_score=0.1057 | budget_pdf | 2025-Budget-Statement-and-Economic-Policy_v4.pdf)
+[PAGE 13]
+Resetting the Economy for the Ghana We Want 2025 Budget
+
+SECTION 1: INTRODUCTION
+
+[2] (retrieval_score=0.0992 | budget_pdf | 2025-Budget-Statement-and-Economic-Policy_v4.pdf)
+[PAGE 145]
+Resetting the Economy for the Ghana We Want 2025 Budget 
+Appendix 3A: Summary of Central Government Operations – 2025
+
+[3] (retrieval_score=0.0978 | budget_pdf | 2025-Budget-Statement-and-Economic-Policy_v4.pdf)
+[PAGE 146]
+Resetting the Economy for the Ghana We Want 2025 Budget 
+Appendix 3A: Summary of Central Government Operations – 2025
+
+[4] (retrieval_score=0.0954 | budget_pdf | 2025-Budget-Statement-and-Economic-Policy_v4.pdf)
+[PAGE 1]
+THEME: Resetting The Economy For The Ghana We Want
+
+[PAGE 3]
+The Budget Statement 
+and Economic Policy
+
+of the Government of Ghana for the 
+2025 Financial Year
+
+Presented to Parliament by 
+DR. CASSIEL ATO FORSON (MP) 
+MINISTER FOR FINANCE 
+On Tuesday March 11, 2025
+
+On the Authority of 
+HIS EXCELLENCY JOHN DRAMANI MAHAMA 
+PRESIDENT OF THE REPUBLIC OF GHANA
+
+In accordance with Section 28 of the 
+Public Financial Management Act, 2016 (Act 921)
+
+[PAGE 4]
+THE 2025 BUDGET STATEMENT 
+AND ECONOMIC POLICY OF GOVERNMENT
+
+The Budget Statement and Economic Policy of the Government of Ghana for the 2025 
+Financial Year is available for public access.
+
+To purchase a physical copy, please contact the Ministry’s Public Relations Office at:
+
+Ministry of Finance 
+Public Relations Office 
+New Building, Ground Floor, Rooms 001 and 003 
+P. O. Box MB 40 
+Accra – Ghana
+
+Electronic copies can be downloaded from our website (www.mofep.gov.gh)
+
+[PAGE 5]
+Resetting the Economy for the Ghana We Want 2025 Budget 
+i 
+TABLE OF CONTENTS 
+List of Tables iii 
+List of Figures v 
+Acronyms and Abbreviations vi
+
+SECTION 1: INTRODUCTION 
+1
+
+SECTION 2: GLOBAL ECONOMIC DEVELOPMENTS & OUTLOOK 
+5
+
+[5] (retrieval_score=0.0926 | budget_pdf | 2025-Budget-Statement-and-Economic-Policy_v4.pdf)
+[PAGE 149]
+Resetting the Economy for the Ghana We Want 2025 Budget 
+Appendix 4A: MDA Expenditure Allocation (GH¢) – 2025
+
+[6] (retrieval_score=0.0908 | budget_pdf | 2025-Budget-Statement-and-Economic-Policy_v4.pdf)
+[PAGE 152]
+Resetting the Economy for the Ghana We Want 2025 Budget 
+Appendix 4A: MDA Expenditure Allocation (GH¢) – 2025 [Social Sector – GOG]
+
+[7] (retrieval_score=0.0888 | budget_pdf | 2025-Budget-Statement-and-Economic-Policy_v4.pdf)
+[PAGE 164]
+Resetting the Economy for the Ghana We Want 2025 Budget 
+Appendix 4A: MDA Expenditure Allocation (GH¢) – 2025 [Social Sector – Summary]
+
+[8] (retrieval_score=0.0881 | budget_pdf | 2025-Budget-Statement-and-Economic-Policy_v4.pdf)
+[PAGE 7]
+Resetting the Economy for the Ghana We Want 2025 Budget 
+iii 
+List of Tables
+
+Question: What is the stated theme of the 2025 Budget Statement of Ghana?
+
+Answer:

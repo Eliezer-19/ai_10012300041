@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "academic-city-rag"
+version = "0.1.0"
+description = "Academic City RAG coursework (Parts A–G)"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.0",
+    "pypdf>=4.0",
+    "scikit-learn>=1.3",
+    "numpy>=1.26",
+    "faiss-cpu>=1.8",
+    "sentence-transformers>=3.0",
+    "torch>=2.0",
+    "transformers>=4.40",
+    "streamlit>=1.28",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.pyright]
+extraPaths = ["src"]

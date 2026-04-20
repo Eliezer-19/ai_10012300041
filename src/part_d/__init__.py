@@ -1,0 +1,1 @@
+"""Part D — RAG pipeline."""

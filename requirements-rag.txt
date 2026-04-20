@@ -1,0 +1,10 @@
+# RAG project (Part A + B) — Python dependencies
+pandas>=2.0
+pypdf>=4.0
+scikit-learn>=1.3
+numpy>=1.26
+faiss-cpu>=1.8
+sentence-transformers>=3.0
+torch>=2.0
+transformers>=4.40
+streamlit>=1.28
