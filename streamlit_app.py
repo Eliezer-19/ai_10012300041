@@ -50,6 +50,7 @@ def _feedback_mtime(path: Path | None) -> float:
 def build_pipeline(
     locked_index_str: str,
     ollama_model: str,
+    ollama_host: str,
     retrieve_k: int,
     use_feedback: bool,
     use_cross_encoder: bool,
@@ -61,7 +62,7 @@ def build_pipeline(
     return RAGPipeline.from_saved_index(
         index_dir,
         ollama_model=ollama_model,
-        ollama_host=None,
+        ollama_host=ollama_host or None,
         prompt_variant=PromptVariant(prompt_variant_value),
         retrieve_k=retrieve_k,
         max_total_chars=LOCKED_MAX_CONTEXT_CHARS,
@@ -127,6 +128,17 @@ def main() -> None:
 
     with st.sidebar:
         st.header("Model")
+        ollama_host = st.text_input(
+            "Ollama host (URL)",
+            value=(
+                st.secrets.get("OLLAMA_HOST", None)
+                or os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
+            ),
+            help=(
+                "Streamlit Cloud cannot run `ollama serve` locally. Set this to a reachable Ollama server, "
+                "e.g. `https://<your-vm-domain>` (if you proxy it) or `http://<vm-ip>:11434` (not recommended without auth)."
+            ),
+        )
         ollama_model = st.text_input(
             "Model name",
             value=os.environ.get("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL),
@@ -173,6 +185,7 @@ def main() -> None:
         pipeline = build_pipeline(
             str(LOCKED_INDEX_DIR),
             ollama_model,
+            ollama_host,
             retrieve_k,
             use_feedback,
             use_cross_encoder,
@@ -182,6 +195,10 @@ def main() -> None:
         )
     except Exception as e:
         st.error(f"Failed to load pipeline: {e}")
+        st.info(
+            "If deploying on Streamlit Cloud: host Ollama on a VM and set `OLLAMA_HOST` in Streamlit Secrets, "
+            "or paste the URL in the sidebar."
+        )
         st.stop()
 
     q_col, run_col = st.columns([6, 1], vertical_alignment="bottom")
