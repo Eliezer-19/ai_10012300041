@@ -50,6 +50,78 @@ from part_d.rag_pipeline import RAGPipeline
 from part_g.feedback_loop import FeedbackStore
 
 
+def _is_streamlit_community_cloud_mount() -> bool:
+    """True when running on Streamlit Community Cloud (repos are cloned under ``/mount/src/``)."""
+    try:
+        return "/mount/src/" in str(Path(__file__).resolve())
+    except Exception:
+        return False
+
+
+def _get_ollama_api_key() -> str | None:
+    """Ollama Cloud (ollama.com) uses ``OLLAMA_API_KEY`` as ``Authorization: Bearer``."""
+    try:
+        if st.secrets and "OLLAMA_API_KEY" in st.secrets:
+            k = str(st.secrets["OLLAMA_API_KEY"]).strip()
+            return k or None
+    except Exception:
+        pass
+    k = (os.environ.get("OLLAMA_API_KEY") or "").strip()
+    return k or None
+
+
+def _default_ollama_host_input() -> str:
+    """Prefill sidebar: Secrets → env → local-only default."""
+    try:
+        if st.secrets and "OLLAMA_HOST" in st.secrets:
+            return str(st.secrets["OLLAMA_HOST"]).strip()
+    except Exception:
+        pass
+    v = (os.environ.get("OLLAMA_HOST") or "").strip()
+    if v:
+        return v
+    # Ollama Cloud: host is https://ollama.com — use when an API key exists and no host set.
+    if _get_ollama_api_key():
+        return "https://ollama.com"
+    if _is_streamlit_community_cloud_mount():
+        return ""
+    return "http://127.0.0.1:11434"
+
+
+def _resolve_ollama_host(sidebar_value: str) -> str:
+    """Effective host: non-empty sidebar wins, else Secrets, else env, else localhost (local dev only)."""
+    t = (sidebar_value or "").strip()
+    if t:
+        return t.rstrip("/")
+    try:
+        if st.secrets and "OLLAMA_HOST" in st.secrets:
+            return str(st.secrets["OLLAMA_HOST"]).strip().rstrip("/")
+    except Exception:
+        pass
+    e = (os.environ.get("OLLAMA_HOST") or "").strip()
+    if e:
+        return e.rstrip("/")
+    if _get_ollama_api_key():
+        return "https://ollama.com"
+    if not _is_streamlit_community_cloud_mount():
+        return "http://127.0.0.1:11434"
+    return ""
+
+
+def _is_loopback_ollama_url(url: str) -> bool:
+    u = (url or "").lower()
+    return "127.0.0.1" in u or "localhost" in u
+
+
+def _default_ollama_model_input() -> str:
+    try:
+        if st.secrets and "OLLAMA_MODEL" in st.secrets:
+            return str(st.secrets["OLLAMA_MODEL"]).strip()
+    except Exception:
+        pass
+    return os.environ.get("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL)
+
+
 def _feedback_mtime(path: Path | None) -> float:
     if path is not None and path.is_file():
         return path.stat().st_mtime
@@ -61,6 +133,7 @@ def build_pipeline(
     locked_index_str: str,
     ollama_model: str,
     ollama_host: str,
+    ollama_api_key: str | None,
     retrieve_k: int,
     use_feedback: bool,
     use_cross_encoder: bool,
@@ -73,6 +146,7 @@ def build_pipeline(
         index_dir,
         ollama_model=ollama_model,
         ollama_host=ollama_host or None,
+        ollama_api_key=ollama_api_key,
         prompt_variant=PromptVariant(prompt_variant_value),
         retrieve_k=retrieve_k,
         max_total_chars=LOCKED_MAX_CONTEXT_CHARS,
@@ -140,19 +214,17 @@ def main() -> None:
         st.header("Model")
         ollama_host = st.text_input(
             "Ollama host (URL)",
-            value=(
-                st.secrets.get("OLLAMA_HOST", None)
-                or os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
-            ),
+            value=_default_ollama_host_input(),
+            placeholder="https://ollama.com or your self-hosted Ollama",
             help=(
-                "Streamlit Cloud cannot run `ollama serve` locally. Set this to a reachable Ollama server, "
-                "e.g. `https://<your-vm-domain>` (if you proxy it) or `http://<vm-ip>:11434` (not recommended without auth)."
+                "**Self-hosted:** base URL for `/api/chat` (e.g. `https://your-vm:11434`). "
+                "**Ollama Cloud (ollama.com):** use `https://ollama.com` and set **OLLAMA_API_KEY** in Secrets."
             ),
         )
         ollama_model = st.text_input(
             "Model name",
-            value=os.environ.get("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL),
-            help="Must match `ollama list` (e.g. llama3 or llama3:latest). If you get HTTP 404, run: ollama pull <this name>",
+            value=_default_ollama_model_input(),
+            help="Must match `ollama list` on the remote host (e.g. llama3). You can also set **OLLAMA_MODEL** in Secrets.",
         )
         st.header("Retrieval + prompt")
         prompt_variant = st.selectbox(
@@ -191,11 +263,34 @@ def main() -> None:
     mkey = _feedback_mtime(LOCKED_FEEDBACK_STORE) if use_feedback else 0.0
     cross_encoder_model = os.environ.get("CROSS_ENCODER_MODEL", DEFAULT_CROSS_ENCODER_MODEL)
 
+    ollama_resolved = _resolve_ollama_host(ollama_host)
+    ollama_api_key = _get_ollama_api_key()
+    cloud_ok = bool(ollama_api_key) and "ollama.com" in ollama_resolved.lower()
+    if _is_streamlit_community_cloud_mount() and (
+        not ollama_resolved or _is_loopback_ollama_url(ollama_resolved)
+    ) and not cloud_ok:
+        st.error(
+            "Ollama is not reachable at **127.0.0.1** on Streamlit Cloud. "
+            "Use **Ollama Cloud** (ollama.com + API key) or a **public / reachable** self-hosted Ollama URL."
+        )
+        st.markdown(
+            "**Option A — Ollama Cloud:** App → **Secrets**:\n\n"
+            "```toml\n"
+            'OLLAMA_API_KEY = "your_key_here"\n'
+            'OLLAMA_HOST = "https://ollama.com"\n'
+            'OLLAMA_MODEL = "gpt-oss:120b"\n'
+            "```\n\n"
+            "**Option B — Self-hosted:** expose Ollama (ideally HTTPS + auth) and set `OLLAMA_HOST` to that base URL.\n\n"
+            "Do not use `/api/chat` or `/api/generate` in the host field — base URL only."
+        )
+        st.stop()
+
     try:
         pipeline = build_pipeline(
             str(LOCKED_INDEX_DIR),
             ollama_model,
-            ollama_host,
+            ollama_resolved,
+            ollama_api_key,
             retrieve_k,
             use_feedback,
             use_cross_encoder,

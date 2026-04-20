@@ -106,6 +106,7 @@ class RAGPipeline:
         *,
         ollama_model: str | None = None,
         ollama_host: str | None = None,
+        ollama_api_key: str | None = None,
         feedback_store_path: Path | None = None,
         use_feedback: bool = False,
         **kwargs: Any,
@@ -116,6 +117,7 @@ class RAGPipeline:
             "ollama",
             ollama_model=ollama_model,
             ollama_host=ollama_host,
+            ollama_api_key=ollama_api_key,
         )
         extra = dict(kwargs)
         extra.pop("use_feedback", None)
