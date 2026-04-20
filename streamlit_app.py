@@ -35,6 +35,7 @@ for _name in ("academic_city.rag", "sentence_transformers", "transformers"):
 from academic_city.constants import (
     DEFAULT_CROSS_ENCODER_MODEL,
     DEFAULT_OLLAMA_MODEL,
+    DEFAULT_OLLAMA_MODEL_CLOUD,
     LOCKED_FEEDBACK_MIN_SIM,
     LOCKED_FEEDBACK_POOL_MULT,
     LOCKED_FEEDBACK_STORE,
@@ -119,7 +120,13 @@ def _default_ollama_model_input() -> str:
             return str(st.secrets["OLLAMA_MODEL"]).strip()
     except Exception:
         pass
-    return os.environ.get("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL)
+    env = (os.environ.get("OLLAMA_MODEL") or "").strip()
+    if env:
+        return env
+    # ollama.com uses different tags than local Ollama; llama3 often is not valid on the cloud API.
+    if _get_ollama_api_key():
+        return DEFAULT_OLLAMA_MODEL_CLOUD
+    return DEFAULT_OLLAMA_MODEL
 
 
 def _feedback_mtime(path: Path | None) -> float:
@@ -224,7 +231,10 @@ def main() -> None:
         ollama_model = st.text_input(
             "Model name",
             value=_default_ollama_model_input(),
-            help="Must match `ollama list` on the remote host (e.g. llama3). You can also set **OLLAMA_MODEL** in Secrets.",
+            help=(
+                "**Self-hosted:** name from `ollama list` (e.g. llama3). "
+                "**ollama.com:** use a model your API key supports — set **OLLAMA_MODEL** in Secrets if the default is wrong."
+            ),
         )
         st.header("Retrieval + prompt")
         prompt_variant = st.selectbox(
@@ -278,7 +288,7 @@ def main() -> None:
             "```toml\n"
             'OLLAMA_API_KEY = "your_key_here"\n'
             'OLLAMA_HOST = "https://ollama.com"\n'
-            'OLLAMA_MODEL = "gpt-oss:120b"\n'
+            'OLLAMA_MODEL = "gpt-oss"\n'
             "```\n\n"
             "**Option B — Self-hosted:** expose Ollama (ideally HTTPS + auth) and set `OLLAMA_HOST` to that base URL.\n\n"
             "Do not use `/api/chat` or `/api/generate` in the host field — base URL only."

@@ -69,10 +69,16 @@ class OllamaChatGenerator(TextGenerator):
             if e.code == 401 or e.code == 403:
                 hint = "Unauthorized — check **OLLAMA_API_KEY** (Bearer) for ollama.com, or host access for self-hosted Ollama."
             elif e.code == 404:
-                hint = (
-                    f"Model missing or wrong name (404). For local Ollama: `ollama list` / `ollama pull {self.model}`. "
-                    "For ollama.com, use a model name your account can run."
-                )
+                if "ollama.com" in self.base_url.lower():
+                    hint = (
+                        f"Model {self.model!r} is not available on ollama.com for your account. "
+                        "Set **OLLAMA_MODEL** in Streamlit Secrets (or the sidebar) to a model your API key can run "
+                        "(see ollama.com’s model list / docs). Local names like `llama3` often do not match cloud names."
+                    )
+                else:
+                    hint = (
+                        f"Model missing or wrong name (404). For local Ollama: `ollama list` / `ollama pull {self.model}`."
+                    )
             elif e.code == 500:
                 hint = (
                     "Internal server error — prompt/context too large, or upstream overload. "

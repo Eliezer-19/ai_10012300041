@@ -31,7 +31,10 @@ LOCKED_FEEDBACK_STORE: Path = DEFAULT_FEEDBACK_STORE
 LOCKED_FEEDBACK_WEIGHT: float = 0.25
 LOCKED_FEEDBACK_MIN_SIM: float = 0.68
 LOCKED_FEEDBACK_POOL_MULT: int = 3
+# Local `ollama run` / `ollama pull` names (e.g. llama3)
 DEFAULT_OLLAMA_MODEL: str = "llama3"
+# ollama.com API model names differ from local Ollama — set OLLAMA_MODEL in Secrets to one your key can run.
+DEFAULT_OLLAMA_MODEL_CLOUD: str = "gpt-oss"
 
 # Cross-encoder rerank (hybrid top-k → CE scores → final top retrieve_k)
 DEFAULT_CROSS_ENCODER_MODEL: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
